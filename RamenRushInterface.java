@@ -1,19 +1,36 @@
 package RR;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JComboBox;
+import javax.swing.JButton;
 
 /**
  *This is a an app that emulates a menu, cart and receipt builder for a ramen restaurant
@@ -72,8 +89,10 @@ public class RamenRushInterface extends javax.swing.JFrame {
     private javax.swing.JButton PrintButton; // creates reciept based on Cart and Pay button calculations.
     private javax.swing.JButton DeleteButton; // this will delete an item out of cart and calculations.
     private JTable cart; //table that represents our cart.
-    private JTextArea eceipt; // this is a text area that is space to create our reciept
-    
+    private static JTextArea eceipt; // this is a text area that is space to create our reciept
+    private int orderNumber = 1;
+    private JComboBox <String> comboBox;
+    private javax.swing.JButton ORButton;
     
     public static void main(String args[]) {//runs the file - Main
     	   
@@ -116,7 +135,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * pay button
      * print button
      * 	
-     * 
+     *  @Author Su Man
      */
     private void Components() {
         Item1Button = new javax.swing.JButton();
@@ -203,7 +222,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
         CartNPrintPanel.setLayout(gl_CartNPrintPanel);
         
         eceipt = new JTextArea();
-        jScrollPane2.setViewportView(eceipt);
+        jScrollPane2.setViewportView(getEceipt());
         receipt();
         
         cart = new JTable();
@@ -246,6 +265,8 @@ public class RamenRushInterface extends javax.swing.JFrame {
         a9.setHorizontalAlignment(SwingConstants.CENTER);
         a9.setForeground(Color.LIGHT_GRAY);
         
+    	
+    	
         MenuPanel = new javax.swing.JPanel();
         javax.swing.GroupLayout gl_MenuPanel = menuPanel();
         MenuPanel.setLayout(gl_MenuPanel);
@@ -254,7 +275,17 @@ public class RamenRushInterface extends javax.swing.JFrame {
         JLabel TitleLabel = new JLabel("Welcome to Ramen Rush!!");
         title(TitleLabel);
         getContentPane().add(TitleLabel, BorderLayout.NORTH);
-       
+    
+    	
+        List<String> textFiles = getTextFiles();
+        for (String file : textFiles) {
+            comboBox.addItem(file);
+        }
+     
+        
+      
+     
+        
         pack();
     } // end to components
 
@@ -263,6 +294,8 @@ public class RamenRushInterface extends javax.swing.JFrame {
     	 * builds the table for our Cart.
     	 * adds font and 
     	 * string for ID item QTY and Price
+    	 * 
+    	 * @author kyle blunt
     	 */
     	private void shoppingCart() {
     		cart.setFont(new Font("Arial Black", Font.PLAIN, 15)); 
@@ -284,6 +317,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
     /**
      * creates layout and fonts of our title label	
      * @param TitleLabel
+     * @author Su Man
      */
 	private void title(JLabel TitleLabel) {
 		TitleLabel.setOpaque(true);
@@ -305,6 +339,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	  * @param Name- description of item ordered
 	  * @param Qty - amount of item your gonna purchase
 	  * @param Price- total price of item( so if one item @ 4.99 it will display 4.99, but 2 will display 9.98
+	  * @author kyle blunt
 	  */
     public void addtables(int id ,String Name,int Qty ,Double Price){
         
@@ -340,6 +375,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * This will take the amount from each row and use it to get the Total of all items in cart
      * 
      * using the format for money
+     * @author kyle blunt
      */
     public void calculateTotal(){
 
@@ -364,6 +400,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * sets font
      * text
      * and actionListener
+     * @author kyle blunt
      */
 	private void delete() {
 		DeleteButton.setFont(new java.awt.Font("Arial Black", 1, 24));
@@ -381,6 +418,8 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * sets font
      * text
      * and actionListener
+     * 
+     * @author kyle blunt
      */
 	private void print() {
 		PrintButton.setFont(new java.awt.Font("Arial Black", 1, 38)); 
@@ -398,6 +437,8 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * sets font
      * text
      * and actionListener
+     * 
+     * @author kyle blunt
      */
 	private void pay() {
 		PayButton.setFont(new java.awt.Font("Arial Black", 1, 36)); 
@@ -415,7 +456,8 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * and cash label method
      * sets font
      * text
-     * and actionListener
+     * 
+     * @author kyle blunt
      */
 	private void cash() {
 		CashLabel.setFont(new java.awt.Font("Arial Black", 1, 29)); 
@@ -430,7 +472,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * and balance lable method
      * sets font
      * text
-     * and actionListener
+     * @author kyle blunt
      */
 	private void balance() {
 		BalanceLabel.setFont(new java.awt.Font("Arial Black", 1, 29)); 
@@ -448,6 +490,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * sets font
      * text
      * and actionListener
+     * @author kyle Blunt
      */
 	private void total() {
 		TotalLabel.setFont(new Font("Arial Black", Font.BOLD, 29));
@@ -461,10 +504,11 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	
 	 /**
      * sets receipt rows and columns
+     * @kyle blunt
      */
 	private void receipt() {
-		eceipt.setColumns(20);
-        eceipt.setRows(5);
+		getEceipt().setColumns(20);
+        getEceipt().setRows(5);
 	}
 	
 	
@@ -474,6 +518,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item7() {
 		Item7Button.setIcon(new ImageIcon(RamenRushInterface.class.getResource("/RR/item8.png")));
@@ -496,6 +541,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item8() {
 		ItemL8.setFont(new Font("Arial Black", Font.BOLD, 18)); // NOI18N
@@ -517,6 +563,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item9() {
 		Item9Button.setIcon(new ImageIcon(RamenRushInterface.class.getResource("/RR/item9.png"))); 
@@ -539,6 +586,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @Author Su Man
 	 *
 	 */
 	private void item4() {
@@ -561,6 +609,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item5Label() {
 		ItemL5.setFont(new Font("Arial Black", Font.BOLD, 18)); 
@@ -585,6 +634,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item6Label() {
 		ItemL6.setFont(new Font("Arial Black", Font.BOLD, 15)); 
@@ -609,6 +659,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item3Label() {
 		ItemL3.setFont(new Font("Arial Black", Font.BOLD, 18)); 
@@ -633,6 +684,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item2Label() {
 		ItemL2.setFont(new Font("Arial Black", Font.BOLD, 16));
@@ -657,6 +709,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and action listener
 	 * sets font
 	 * and horizontal alignment
+	 * @author Su Man
 	 */
 	private void item1Label() {
 		ItemL1.setFont(new Font("Arial Black", Font.BOLD, 18)); 
@@ -680,6 +733,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item1ButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	 int i = Integer.valueOf(a1.getText());
@@ -699,6 +753,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @author Su Man
 	 */
     private void Item2ButtonActionPerformed(java.awt.event.ActionEvent evt) {
       
@@ -717,6 +772,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item3ButtonActionPerformed(java.awt.event.ActionEvent evt) {
         
@@ -734,6 +790,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item4ButtonActionPerformed(java.awt.event.ActionEvent evt) {
       
@@ -751,6 +808,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item5ButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	 int i = Integer.valueOf(a5.getText());
@@ -768,6 +826,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item6ButtonActionPerformed(java.awt.event.ActionEvent evt) {
       
@@ -785,6 +844,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item7ButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	 int i = Integer.valueOf(a7.getText());
@@ -801,6 +861,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item8ButtonActionPerformed(java.awt.event.ActionEvent evt) {
        
@@ -818,6 +879,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * and increases the guantity of each click
 	 * then calculates total
 	 * @param evt
+	 * @Author Su Man
 	 */
     private void Item9ButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	 int i = Integer.valueOf(a9.getText());
@@ -836,6 +898,7 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	 * 
 	 * this will delete selected row and turn the corresponding quantity label to 0.
 	 * @param evt
+	 * @Author Kyle Blunt
 	 */
     private void DeleteButtonActionPerformed(java.awt.event.ActionEvent evt) {
            
@@ -900,9 +963,10 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * when you select pay it will take the inputted cash value and minus the total to give you remaining 
      * balance or the cashback total
      * @param evt
+     * @Author Kyle Blunt & Su Man
      */
     private void PayButtonActionPerformed(java.awt.event.ActionEvent evt) {
-      
+     try { 
         
         double tot = Double.valueOf(TotalPrice.getText());
         double paid = Double.valueOf(CashGiven.getText());
@@ -913,9 +977,93 @@ public class RamenRushInterface extends javax.swing.JFrame {
        
         bnumber.setText(String.valueOf(format.format(balance)));
        
+    } catch (Exception e) {
+    	JOptionPane.showMessageDialog(null,"Wrong Input, please enter in numeral format");
+    }
     }// end to paybutton action
+     
+    private void saveTextToFile(String text) {
+        // Replace 'packageName' with your actual package name
+        String packageName = "RR";
+
+        // Create a folder path based on the package name
+        String folderPath = "src/" + packageName.replace(".", "/") + "/files2/";
+
+        // Ensure the folder exists, create it if it doesn't
+        File folder = new File(folderPath);
+        if (!folder.exists()) {
+            folder.mkdirs(); // Creates directories including any missing parent directories
+        }
+
+        // Define the file path and name
+        String filePath = folderPath + "receipt"+ orderNumber +".txt";
+
+        try {
+            // Create FileWriter object with file path
+            FileWriter writer = new FileWriter(filePath);
+
+            // Write the text to the file
+            writer.write(text);
+
+            // Close the writer
+            writer.close();
+
+            JOptionPane.showMessageDialog(this, "Receipt saved to file successfully at: " + filePath, "File Saved", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "An error occurred while saving the text to file.", "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private List<String> getTextFiles() {
+        List<String> textFiles = new ArrayList<>();
+        
+  
+        String folderPath = "src/RR/files2/";
+
+        File folder = new File(folderPath);
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile() && file.getName().toLowerCase().endsWith(".txt")) {
+                    textFiles.add(file.getName());
+                }
+            }
+        }
+
+        return textFiles;
+    }
+
+    private void displayFileContent(String fileName) {
+        // Replace 'folderPath' with the path to your folder containing text files
+        String folderPath = "src/RR/files2/";
+
+        try {
+            File file = new File(folderPath + fileName);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            StringBuilder content = new StringBuilder();
+
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+            reader.close();
+            eceipt.setText(content.toString());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error reading file.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
     
-    
+    private void refreshFileComboBox() {
+        comboBox.removeAllItems();
+        List<String> textFiles = getTextFiles();
+        for (String file : textFiles) {
+            comboBox.addItem(file);
+        }
+    }
     /**
      * This is an event for the Print button
      * 
@@ -927,23 +1075,23 @@ public class RamenRushInterface extends javax.swing.JFrame {
      * cash paid
      * and balance
      * @param evt
+     * @Author Kyle BLunt
      */
     private void PrintButtonActionPerformed(java.awt.event.ActionEvent evt) {
       
         
         try {
             
-            eceipt.setText("                               Ramen Rush    \n");
-            eceipt.setText(eceipt.getText() + "                            1220 Ash Drive, \n");
-            eceipt.setText(eceipt.getText() + "                          New York, New York, \n");
-            eceipt.setText(eceipt.getText() + "                           84040 8013905795, \n");
-            eceipt.setText(eceipt.getText() + "---------------------------------------------------------------------\n");
-            eceipt.setText(eceipt.getText() + "  Item \t\tQty \tPrice" +"\n");
-            eceipt.setText(eceipt.getText() + "---------------------------------------------------------------------\n");
+            getEceipt().setText("                               Ramen Rush    \n");
+            getEceipt().setText(getEceipt().getText() + "                            1220 Ash Drive, \n");
+            getEceipt().setText(getEceipt().getText() + "                          New York, New York, \n");
+            getEceipt().setText(getEceipt().getText() + "                           84040 8013905795, \n");
+            getEceipt().setText(getEceipt().getText() + "                          Order Number : "+orderNumber +" \n");
+            getEceipt().setText(getEceipt().getText() + "---------------------------------------------------------------------\n");
+            getEceipt().setText(getEceipt().getText() + "  Item \t\tQty \tPrice" +"\n");
+            getEceipt().setText(getEceipt().getText() + "---------------------------------------------------------------------\n");
             
             DefaultTableModel format = (DefaultTableModel) cart.getModel();
-            
-           
             
             for (int i = 0; i < cart.getRowCount(); i++) {
                 
@@ -951,47 +1099,55 @@ public class RamenRushInterface extends javax.swing.JFrame {
                 String Qty = format.getValueAt(i, 2).toString();
                 String Price = format.getValueAt(i, 3).toString();
                 
-                eceipt.setText(eceipt.getText() +"  "+ Name+"\t\t"+Qty +"\t"+Price + "\n");
+                getEceipt().setText(getEceipt().getText() +"  "+ Name+"\t\t"+Qty +"\t"+Price + "\n");
             }
             
-            eceipt.setText(eceipt.getText() + "---------------------------------------------------------------------\n");
-            eceipt.setText(eceipt.getText() + "Total     : " + TotalPrice.getText() +"\n");
-            eceipt.setText(eceipt.getText() + "Cash      : " + CashGiven.getText() +"\n");
-            eceipt.setText(eceipt.getText() + "Balance   : " + bnumber.getText() +"\n");
-            eceipt.setText(eceipt.getText() + "---------------------------------------------------------------------\n");
-            eceipt.setText(eceipt.getText() + "                     Gaurunteed Yummy Ramen!        "+"\n");
-            eceipt.setText(eceipt.getText() + "---------------------------------------------------------------------\n");
+            getEceipt().setText(getEceipt().getText() + "---------------------------------------------------------------------\n");
+            getEceipt().setText(getEceipt().getText() + "Total     : " + TotalPrice.getText() +"\n");
+            getEceipt().setText(getEceipt().getText() + "Cash      : " + CashGiven.getText() +"\n");
+            getEceipt().setText(getEceipt().getText() + "Balance   : " + bnumber.getText() +"\n");
+            getEceipt().setText(getEceipt().getText() + "---------------------------------------------------------------------\n");
+            getEceipt().setText(getEceipt().getText() + "                     Gaurunteed Yummy Ramen!        "+"\n");
+            getEceipt().setText(getEceipt().getText() + "---------------------------------------------------------------------\n");
        
-            eceipt.setText(eceipt.getText() + "                 Dont forget to check out our website "+"\n");
-            eceipt.setText(eceipt.getText() + "                            and leave a review!! "+"\n");
-            eceipt.setText(eceipt.getText() + "                     Interface Built by Su and Kyle"+"\n");
-        eceipt.print(); //print
-            
+            getEceipt().setText(getEceipt().getText() + "                 Dont forget to check out our website "+"\n");
+            getEceipt().setText(getEceipt().getText() + "                            and leave a review!! "+"\n");
+            getEceipt().setText(getEceipt().getText() + "                     Interface Built by Su and Kyle"+"\n");
+        getEceipt().print(); //print
+         orderNumber++;
+         refreshFileComboBox();
+        String text = eceipt.getText();
+        saveTextToFile(text);
             
         } catch (Exception e) {
             
-            System.out.println(e);
+            System.out.println("Error");
             
-            
+        
         }
         
          }// end to print create action
     
+    /**
+     * this method is what builds out the group panel for menu panel
+     * @return the menupanel group layout
+     * @author Su Man
+     */
     private javax.swing.GroupLayout menuPanel() {
     	MenuPanel.setBackground(Color.DARK_GRAY);
     	javax.swing.GroupLayout gl_MenuPanel = new javax.swing.GroupLayout(MenuPanel);
     	gl_MenuPanel.setHorizontalGroup(
     		gl_MenuPanel.createParallelGroup(Alignment.LEADING)
     			.addGroup(gl_MenuPanel.createSequentialGroup()
-    				.addGroup(gl_MenuPanel.createParallelGroup(Alignment.LEADING)
-    					.addGroup(Alignment.TRAILING, gl_MenuPanel.createSequentialGroup()
+    				.addGroup(gl_MenuPanel.createParallelGroup(Alignment.TRAILING)
+    					.addGroup(gl_MenuPanel.createSequentialGroup()
     						.addContainerGap()
     						.addComponent(Item1Button, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE))
-    					.addGroup(gl_MenuPanel.createSequentialGroup()
+    					.addGroup(Alignment.LEADING, gl_MenuPanel.createSequentialGroup()
     						.addGap(14)
     						.addGroup(gl_MenuPanel.createParallelGroup(Alignment.LEADING)
-    							.addComponent(Item7Button, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
     							.addComponent(Item4Button, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
+    							.addComponent(Item7Button, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE)
     							.addGroup(gl_MenuPanel.createSequentialGroup()
     								.addComponent(ItemL1, GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
     								.addPreferredGap(ComponentPlacement.RELATED)
@@ -1061,13 +1217,13 @@ public class RamenRushInterface extends javax.swing.JFrame {
     									.addComponent(Item2Button, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
     									.addComponent(Item1Button, 0, 0, Short.MAX_VALUE))
     								.addPreferredGap(ComponentPlacement.RELATED)
-    								.addGroup(gl_MenuPanel.createParallelGroup(Alignment.LEADING)
-    									.addGroup(Alignment.TRAILING, gl_MenuPanel.createSequentialGroup()
+    								.addGroup(gl_MenuPanel.createParallelGroup(Alignment.TRAILING)
+    									.addGroup(gl_MenuPanel.createSequentialGroup()
     										.addGroup(gl_MenuPanel.createParallelGroup(Alignment.BASELINE)
     											.addComponent(ItemL1)
     											.addComponent(a1, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
     										.addGap(9))
-    									.addGroup(Alignment.TRAILING, gl_MenuPanel.createParallelGroup(Alignment.BASELINE)
+    									.addGroup(gl_MenuPanel.createParallelGroup(Alignment.BASELINE)
     										.addComponent(ItemL2, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
     										.addComponent(a2, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)))))
     						.addPreferredGap(ComponentPlacement.RELATED)
@@ -1169,39 +1325,67 @@ public class RamenRushInterface extends javax.swing.JFrame {
 	/**
 	 * this builds out the group layout for our cart and print panel
 	 * @return
+	 * @author Su Man
 	 */
 	private javax.swing.GroupLayout cartAndPrintPanel() {
 		CartNPrintPanel.setBackground(Color.BLACK);
-		javax.swing.GroupLayout gl_CartNPrintPanel = new javax.swing.GroupLayout(CartNPrintPanel);
+		comboBox = new JComboBox();
+    	JButton ORButton = new JButton("Open Receipt");
+    	 List<String> textFiles = getTextFiles();
+         for (String file : textFiles) {
+             comboBox.addItem(file);
+         }
 
+         ORButton.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent e) {
+                 String selectedFile = (String) comboBox.getSelectedItem();
+                 if (selectedFile != null) {
+                     displayFileContent(selectedFile);
+                 }
+             }
+         });
+    	
+		javax.swing.GroupLayout gl_CartNPrintPanel = new javax.swing.GroupLayout(CartNPrintPanel);
 		gl_CartNPrintPanel.setHorizontalGroup(
-				gl_CartNPrintPanel.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+			gl_CartNPrintPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_CartNPrintPanel.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_CartNPrintPanel.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-								.addComponent(DeleteButton)
-								.addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(10, Short.MAX_VALUE))
-				.addGroup(gl_CartNPrintPanel.createSequentialGroup()
-						.addComponent(CalculatorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addGap(0, 0, Short.MAX_VALUE))
-				);
+					.addContainerGap()
+					.addGroup(gl_CartNPrintPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(DeleteButton)
+						.addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 336, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_CartNPrintPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_CartNPrintPanel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(jScrollPane2, GroupLayout.PREFERRED_SIZE, 345, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_CartNPrintPanel.createSequentialGroup()
+							.addGap(79)
+							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 155, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(ORButton))))
+				.addComponent(CalculatorPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		);
 		gl_CartNPrintPanel.setVerticalGroup(
-				gl_CartNPrintPanel.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+			gl_CartNPrintPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_CartNPrintPanel.createSequentialGroup()
-						.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addGroup(gl_CartNPrintPanel.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-								.addComponent(jScrollPane2)
-								.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(DeleteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(CalculatorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addGap(18, 18, 18))
-				);
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_CartNPrintPanel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(jScrollPane2)
+						.addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_CartNPrintPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_CartNPrintPanel.createParallelGroup(Alignment.BASELINE)
+							.addComponent(ORButton, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
+							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
+						.addComponent(DeleteButton, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(CalculatorPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(18))
+		);
 		return gl_CartNPrintPanel;
 	}//end to cartNPrintPanel
-	
+
+
+	public static JTextArea getEceipt() {
+		return eceipt;
+	}
 }// end to program (ramenrushinterface)
